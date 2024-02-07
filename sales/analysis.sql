@@ -36,4 +36,33 @@ SELECT p.Product_Name,
 	GROUP BY p.Product_Name
 	ORDER BY Total_Sales DESC;
 
+-- Highest performing month/quarter
+WITH monthly_sales AS (
+SELECT p.Product_ID AS ID, p.Product_Name AS Name,
+	s.date_month AS Month,
+	FORMAT(ROUND(SUM(s.Units * p.Product_Price), 2), 'C', 'en-us') AS Total_Sales
+	FROM products p
+	INNER JOIN sales s ON p.Product_ID = s.Product_ID
+	GROUP BY p.Product_ID, p.Product_Name, s.date_month
+)
+SELECT Name, Month, Total_Sales
+	FROM (
+		SELECT *,
+			ROW_NUMBER() OVER(PARTITION BY Month ORDER BY Total_Sales) AS Rank
+			FROM monthly_sales
+		) AS temp
+	WHERE Rank = 1;
 
+-- Profit earned for each product category
+WITH earnings AS (
+SELECT p.Product_ID, p.Product_Name, 
+	COUNT(s.Units) AS Units_Sold,
+	ROUND(SUM(s.Units * p.Product_Price), 2) AS Revenue, 
+	ROUND(SUM(s.Units * p.Product_Cost), 2) AS Cost
+	FROM products p
+	INNER JOIN sales s ON p.Product_ID = s.Product_ID
+	GROUP BY p.Product_ID, p.Product_Name
+)
+SELECT Product_Name, Units_Sold,
+	FORMAT(ROUND(Revenue - Cost, 2), 'C', 'en-us') AS Revenue
+	FROM earnings;

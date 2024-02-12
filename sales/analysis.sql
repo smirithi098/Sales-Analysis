@@ -55,14 +55,17 @@ SELECT Name, Month, Total_Sales
 
 -- Profit earned for each product category
 WITH earnings AS (
-SELECT p.Product_ID, p.Product_Name, 
-	COUNT(s.Units) AS Units_Sold,
+SELECT p.Product_Name, 
+	SUM(s.Units) AS Units_Sold,
 	ROUND(SUM(s.Units * p.Product_Price), 2) AS Revenue, 
 	ROUND(SUM(s.Units * p.Product_Cost), 2) AS Cost
 	FROM products p
 	INNER JOIN sales s ON p.Product_ID = s.Product_ID
-	GROUP BY p.Product_ID, p.Product_Name
+	GROUP BY p.Product_Name
 )
 SELECT Product_Name, Units_Sold,
-	FORMAT(ROUND(Revenue - Cost, 2), 'C', 'en-us') AS Revenue
-	FROM earnings;
+	FORMAT(ROUND(Revenue - Cost, 2), 'C', 'en-us') AS Profit
+	FROM earnings
+	ORDER BY Units_Sold DESC;
+
+

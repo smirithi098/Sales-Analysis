@@ -68,4 +68,36 @@ SELECT Product_Name, Units_Sold,
 	FROM earnings
 	ORDER BY Units_Sold DESC;
 
+-- Top 3 products sold in each store
+WITH top_sold_product AS (
+	SELECT p.Product_Name, sr.Store_Name, SUM(s.Units) AS sell_count,
+		ROW_NUMBER() OVER(PARTITION BY sr.Store_Name 
+			ORDER BY SUM(s.Units) DESC) AS ranking
+		FROM sales s INNER JOIN products p
+		ON s.Product_ID = p.Product_ID
+		INNER JOIN stores sr
+		ON s.Store_ID = sr.Store_ID
+		GROUP BY p.Product_Name, sr.Store_Name
+)
+SELECT Product_Name, Store_Name, sell_count 
+	FROM top_sold_product
+	WHERE ranking < 4;
+
+-- How much money is tied up in inventory?
+SELECT p.Product_Name, s.Store_Name, 
+		SUM(i.Stock_On_Hand * p.Product_Cost) AS money_on_stock
+	FROM inventory i
+	INNER JOIN products p
+	ON i.Product_ID = p.Product_ID
+	INNER JOIN stores s
+	ON i.Store_ID = s.Store_ID
+	GROUP BY p.Product_Name, s.Store_Name;
+
+
+
+
+	
+	
+
+
 

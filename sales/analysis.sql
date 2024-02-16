@@ -86,6 +86,8 @@ SELECT Name, Month, year, Total_Sales
 GO
 
 -- Profit earned for each product category
+GO
+CREATE OR ALTER VIEW profit_per_product AS
 WITH earnings AS (
 SELECT p.Product_Name, 
 	SUM(s.Units) AS Units_Sold,
@@ -96,13 +98,15 @@ SELECT p.Product_Name,
 	GROUP BY p.Product_Name
 )
 SELECT Product_Name, Units_Sold,
-	FORMAT(ROUND(Revenue - Cost, 2), 'C', 'en-us') AS Profit
-	FROM earnings
-	ORDER BY Units_Sold DESC;
+	ROUND(Revenue - Cost, 2) AS Profit
+	FROM earnings;
+GO
 
 -- Top 3 products sold in each store
+GO
+CREATE OR ALTER VIEW top_products_sold AS
 WITH top_sold_product AS (
-	SELECT p.Product_Name, sr.Store_Name, SUM(s.Units) AS sell_count,
+	SELECT p.Product_Name, sr.Store_Name, SUM(s.Units) AS units_sold,
 		ROW_NUMBER() OVER(PARTITION BY sr.Store_Name 
 			ORDER BY SUM(s.Units) DESC) AS ranking
 		FROM sales s INNER JOIN products p
@@ -111,19 +115,21 @@ WITH top_sold_product AS (
 		ON s.Store_ID = sr.Store_ID
 		GROUP BY p.Product_Name, sr.Store_Name
 )
-SELECT Product_Name, Store_Name, sell_count 
+SELECT Product_Name, Store_Name, units_sold 
 	FROM top_sold_product
 	WHERE ranking < 4;
+GO
 
--- How much money is tied up in inventory?
-SELECT p.Product_Name, s.Store_Name, 
-		SUM(i.Stock_On_Hand * p.Product_Cost) AS money_on_stock
-	FROM inventory i
+-- Sales every year/quarter/month
+GO
+CREATE OR ALTER VIEW overall_sales AS
+SELECT date_year AS Year, date_qtr AS Quarter, date_month AS Month,
+		ROUND(SUM(Units * product_Price), 2) AS Total_Sales
+	FROM sales s
 	INNER JOIN products p
-	ON i.Product_ID = p.Product_ID
-	INNER JOIN stores s
-	ON i.Store_ID = s.Store_ID
-	GROUP BY p.Product_Name, s.Store_Name;
+	ON s.Product_ID = p.Product_ID
+	GROUP BY date_year, date_qtr, date_month;
+GO
 
 
 

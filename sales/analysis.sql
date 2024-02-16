@@ -10,7 +10,7 @@ SELECT DISTINCT Store_Location FROM stores;
 
 -- Most stocked product category in each store location
 GO
-CREATE VIEW most_stocked_product AS
+CREATE OR ALTER VIEW most_stocked_product AS
 WITH stock AS (
 	SELECT s.Store_ID, s.Store_Name, p.Product_Category, 
 		SUM(i.Stock_On_Hand) AS stock_count,
@@ -36,7 +36,7 @@ GO
 
 -- Number of stores in a location vs the cumulative sales in each location
 GO
-CREATE VIEW store_sales AS
+CREATE OR ALTER VIEW store_sales AS
 	SELECT table1.Store_Location, total_stores, total_sales FROM 
 		(SELECT Store_Location, COUNT(stores.Store_ID) AS total_stores
 			FROM stores
@@ -129,12 +129,7 @@ SELECT date_year AS Year, date_qtr AS Quarter, date_month AS Month,
 	INNER JOIN products p
 	ON s.Product_ID = p.Product_ID
 	GROUP BY date_year, date_qtr, date_month;
-GO
-
-
-
-
-	
+GO	
 	
 
 

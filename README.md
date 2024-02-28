@@ -28,5 +28,5 @@ This project analyses a fictional toy stores data across various locations. The 
 
 The report summarizes the sales metrics namely, *Total revenue*, *Gross Profit*, *Profit margin*, *Year-on-year Growth*  for all products across all stores. The report shows an overall understanding of the sales and which store locations give higher profits in addition to profitable products.
 
-[Sales report]<a href="sales/SalesReport.pdf" class="image fit"><img src="images/marr_pic.jpg" alt=""></a>
+<a href="sales/SalesReport.pdf" class="image fit"><img src="sales/SalesReport.png" alt=""></a>
 
